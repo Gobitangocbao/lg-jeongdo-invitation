@@ -919,21 +919,13 @@
                 </svg>
                 Đi Đến Phiếu Đăng Ký (RSVP)
             </button>
-            <button class="btn btn-secondary" onclick="exportToExcel()">
+            <button class="btn btn-secondary" onclick="exportInvitationCard()">
                 <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="8" y1="13" x2="16" y2="13"/>
-                    <line x1="8" y1="17" x2="16" y2="17"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                Tải File Excel
-            </button>
-            <button class="btn btn-secondary" onclick="copyEmailText()">
-                <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-                Sao Chép Thư Mời
+                Xuất Thư Mời
             </button>
             <button class="btn btn-secondary" onclick="window.print()">
                 <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1265,17 +1257,9 @@
                         <span>Thông tin của Quý vị sẽ được gửi trực tiếp tới email <strong>minhhien.hoang@lge.com</strong> và <strong>hang2.bui@lge.com</strong> (Phòng Kiểm Toán LG Electronics).</span>
                     </div>
                     <div class="form-btns">
-                        <button type="button" class="btn btn-secondary" onclick="exportToExcel()">
-                            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
-                            Xuất File Excel
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="copyReplyText()">
-                            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            Sao Chép Email
-                        </button>
-                        <button type="button" class="btn btn-outline-red" onclick="sendMailtoEmail()">
-                            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                            Trả Lời Mail Trực Tiếp
+                        <button type="button" class="btn btn-secondary" onclick="exportInvitationCard()">
+                            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            Xuất Thư Mời
                         </button>
                         <button type="submit" class="btn btn-primary">
                             <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -1485,68 +1469,87 @@
         }
 
         // =================================================================
-        // EXPORT TO EXCEL
+        // EXPORT INVITATION CARD AS PNG
+        // Uses html2canvas to capture the invitation area as an image
+        // Pre-fills attendee name & company from the form
         // =================================================================
-        function exportToExcel() {
-            alert('📊 Dữ liệu đăng ký đã được lưu trực tiếp vào Google Sheet.\n\nVui lòng mở Google Sheet "LG JeongDo RSVP Database" để xem và tải xuống danh sách đăng ký.\n\n(Chỉ người có quyền truy cập Sheet mới xem được dữ liệu)');
-            logActivity('EXPORT_CSV', 'Admin requested export');
-        }
+        function exportInvitationCard() {
+            const name = document.getElementById('attendeeName').value.trim();
+            const company = document.getElementById('companyName').value.trim();
 
-        // =================================================================
-        // MAILTO FALLBACK
-        // =================================================================
-        function sendMailtoEmail() {
-            const company = document.getElementById('companyName').value || '[Tên Công Ty]';
-            const name = document.getElementById('attendeeName').value || '[Họ và Tên]';
-            const title = document.getElementById('attendeeTitle').value || '[Chức Vụ]';
-            const phone = document.getElementById('phone').value || '[Số Điện Thoại]';
-            const email = document.getElementById('email').value || '[Chưa nhập email]';
-            const status = document.querySelector('input[name="attendanceStatus"]:checked')?.value || 'Đồng ý tham dự';
-            const count = document.getElementById('attendeeCount').value;
-            const feedback = document.getElementById('feedback').value || 'Không có';
+            // Inject personalized attendee banner before the intro section
+            const introSection = document.querySelector('.intro-section');
+            let personalBanner = document.getElementById('personalBanner');
 
-            const subject = encodeURIComponent(`[XÁC NHẬN THAM DỰ] BUỔI CHIA SẺ JEONG-DO MANAGEMENT - ${company}`);
-            const bodyText = `Kính gửi: Phòng Kiểm Toán - LG Electronics Việt Nam (Ms. Hiền & Ms. Hằng),\n\nCông ty chúng tôi xin gửi thông tin đăng ký tham dự buổi chia sẻ trực tuyến "Chính sách Quản lý Jeong-Do" ngày 19/08/2026 như sau:\n\n1. Tên Công ty / Nhà Cung Cấp: ${company}\n2. Họ và tên người đại diện: ${name}\n3. Chức vụ: ${title}\n4. Số điện thoại: ${phone}\n5. Email: ${email}\n6. Trạng thái: ${status}\n7. Số lượng: ${count}\n8. Ý kiến / Câu hỏi: ${feedback}\n\nTrân trọng cảm ơn,\n${name} - ${company}`;
+            if (name || company) {
+                if (!personalBanner) {
+                    personalBanner = document.createElement('div');
+                    personalBanner.id = 'personalBanner';
+                    personalBanner.style.cssText = 'background:linear-gradient(135deg,#FFF5F7,#FFF0F3);border:1px solid #F5C6D0;border-radius:10px;padding:18px 28px;margin:0 0 20px 0;text-align:center;';
+                    introSection.parentNode.insertBefore(personalBanner, introSection);
+                }
+                let bannerHTML = '<div style="font-size:11px;color:#A50034;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">THIỆP MỜI DÀNH CHO</div>';
+                if (name) bannerHTML += '<div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:4px;">' + name + '</div>';
+                if (company) bannerHTML += '<div style="font-size:14px;color:#666;font-weight:500;">' + company + '</div>';
+                personalBanner.innerHTML = bannerHTML;
+            }
 
-            const mailtoUrl = `mailto:minhhien.hoang@lge.com,hang2.bui@lge.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
-            window.location.href = mailtoUrl;
-            logActivity('MAILTO_FALLBACK', company);
-        }
+            // Hide toolbar, form section, and toast during capture
+            const toolbar = document.querySelector('.action-toolbar');
+            const rsvpSection = document.querySelector('.rsvp-section');
+            const toast = document.getElementById('toast');
+            if (toolbar) toolbar.style.display = 'none';
+            if (rsvpSection) rsvpSection.style.display = 'none';
+            if (toast) toast.style.display = 'none';
 
-        // =================================================================
-        // COPY REPLY TEXT
-        // =================================================================
-        function copyReplyText() {
-            const company = document.getElementById('companyName').value || '[Tên Công Ty]';
-            const name = document.getElementById('attendeeName').value || '[Họ và Tên]';
-            const title = document.getElementById('attendeeTitle').value || '[Chức Vụ]';
-            const phone = document.getElementById('phone').value || '[Số Điện Thoại]';
-            const email = document.getElementById('email').value || '[Email]';
-            const status = document.querySelector('input[name="attendanceStatus"]:checked')?.value || 'Đồng ý tham dự';
-            const count = document.getElementById('attendeeCount').value;
-            const feedback = document.getElementById('feedback').value || 'Không có';
+            const card = document.getElementById('invitationCard');
+            showToastMessage('Đang xuất thư mời...');
 
-            const replyContent = `Kính gửi: Phòng Kiểm Toán - LG Electronics Việt Nam,\n\nCông ty chúng tôi xin phản hồi xác nhận đăng ký tham dự buổi chia sẻ trực tuyến "Chính sách Quản lý Jeong-Do" ngày 19/08/2026 như sau:\n\n1. Tên Công ty: ${company}\n2. Họ tên: ${name}\n3. Chức vụ: ${title}\n4. SĐT: ${phone}\n5. Email: ${email}\n6. Trạng thái: ${status}\n7. Số lượng: ${count}\n8. Ý kiến: ${feedback}\n\nTrân trọng cảm ơn,\n${company}`;
+            // Load html2canvas dynamically if not already loaded
+            const doCapture = function() {
+                html2canvas(card, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#F4F4F4',
+                    logging: false
+                }).then(function(canvas) {
+                    // Restore hidden elements
+                    if (toolbar) toolbar.style.display = '';
+                    if (rsvpSection) rsvpSection.style.display = '';
+                    if (toast) toast.style.display = '';
 
-            navigator.clipboard.writeText(replyContent).then(() => {
-                showToastMessage('Đã sao chép Mẫu Trả Lời Email vào Bộ nhớ tạm!');
-            });
-            logActivity('COPY_EMAIL', company);
-        }
+                    // Download as PNG
+                    const link = document.createElement('a');
+                    const fileName = 'LG_JeongDo_ThiepMoi' + (name ? '_' + name.replace(/\s+/g, '_') : '') + '.png';
+                    link.download = fileName;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
 
-        // =================================================================
-        // COPY INVITATION TEXT
-        // =================================================================
-        function copyEmailText() {
-            const params = new URLSearchParams(window.location.search);
-            const s = params.get('session');
-            const sd = SESSION_DATA[s] || SESSION_DATA['sang'];
-            const emailContent = `THƯ MỜI THAM DỰ BUỔI CHIA SẺ TRỰC TUYẾN (${sd.label})\nCHÍNH SÁCH QUẢN LÝ JEONG-DO CỦA LG ELECTRONICS VIỆT NAM\n\nKính gửi: Quý Nhà Cung Cấp\n\nPhòng Kiểm toán Công ty LG Electronics Việt Nam xin gửi lời chào trân trọng đến Quý vị. Cảm ơn sự đồng hành quý báu của Quý Nhà Cung Cấp trong thời gian qua. Nhằm tăng cường sự hợp tác bền vững và minh bạch, chúng tôi trân trọng kính mời Quý vị tham dự buổi chia sẻ về "Chính sách Quản lý Jeong-Do" của LG.\n\nTHÔNG TIN SỰ KIỆN:\n- Ngày: Thứ Tư, ngày 19/08/2026\n- Thời gian: ${sd.time}\n- Hình thức: Trực tuyến qua Webex\n- Link: ${sd.webexUrl}\n- Mật khẩu: ${sd.password}\n\n📌 Quý Nhà Cung Cấp vui lòng xác nhận tham dự trước 15:00 Thứ sáu, ngày 14/08/2026.\nLiên hệ: Ms. Hiền (0912371010) hoặc Ms. Hằng (0911100795).\n\nSự tham dự của nhà cung cấp là niềm vinh hạnh của chúng tôi.`;
+                    showToastMessage('✅ Đã xuất thiệp mời thành công!');
+                    logActivity('EXPORT_PNG', company + ' - ' + name);
+                }).catch(function(err) {
+                    // Restore hidden elements on error
+                    if (toolbar) toolbar.style.display = '';
+                    if (rsvpSection) rsvpSection.style.display = '';
+                    if (toast) toast.style.display = '';
+                    showToastMessage('❌ Lỗi xuất ảnh: ' + err.message);
+                });
+            };
 
-            navigator.clipboard.writeText(emailContent).then(() => {
-                showToastMessage('Đã sao chép nội dung thư mời vào bộ nhớ tạm!');
-            });
-            logActivity('COPY_INVITATION', 'Full invitation text');
+            if (typeof html2canvas === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = doCapture;
+                script.onerror = function() {
+                    if (toolbar) toolbar.style.display = '';
+                    if (rsvpSection) rsvpSection.style.display = '';
+                    if (toast) toast.style.display = '';
+                    showToastMessage('❌ Không tải được thư viện xuất ảnh. Kiểm tra kết nối mạng.');
+                };
+                document.head.appendChild(script);
+            } else {
+                doCapture();
+            }
         }
 
         // =================================================================
