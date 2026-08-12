@@ -1031,7 +1031,7 @@
                                     <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                     Thời gian:
                                 </span>
-                                <span class="event-value">9h30 - 10h30</span>
+                                <span class="event-value" id="sessionTime">9h30 - 10h30</span>
                             </div>
 
                             <div class="event-info-item">
@@ -1047,7 +1047,7 @@
                                     <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                                     Link tham dự:
                                 </span>
-                                <a href="https://lgehq.webex.com/lgehq/j.php?MTID=mcac3bb721ab268f1f080f1e937cda0f5"
+                                <a id="webexLink" href="https://lgehq.webex.com/lgehq/j.php?MTID=mcac3bb721ab268f1f080f1e937cda0f5"
                                     target="_blank" class="webex-link-box">
                                     https://lgehq.webex.com/lgehq/j.php?MTID=mcac3bb721ab268f1f080f1e937cda0f5
                                 </a>
@@ -1058,7 +1058,7 @@
                                     <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                     Mật khẩu:
                                 </span>
-                                <div><span class="password-badge">123456</span></div>
+                                <div><span class="password-badge" id="sessionPassword">123456</span></div>
                             </div>
                         </div>
 
@@ -1303,6 +1303,53 @@
 
     <script>
         // =================================================================
+        // SESSION CONFIG — URL parameter controls morning/afternoon
+        // Usage: ?session=sang (morning) or ?session=chieu (afternoon)
+        // =================================================================
+        const SESSION_DATA = {
+            sang: {
+                time: '9h30 - 10h30',
+                label: 'Buổi Sáng',
+                webexUrl: 'https://lgehq.webex.com/lgehq/j.php?MTID=mcac3bb721ab268f1f080f1e937cda0f5',
+                password: '123456',
+                qrData: 'https%3A%2F%2Flgehq.webex.com%2Flgehq%2Fj.php%3FMTID%3Dmcac3bb721ab268f1f080f1e937cda0f5'
+            },
+            chieu: {
+                time: '14h30 - 15h30',
+                label: 'Buổi Chiều',
+                webexUrl: 'https://lgehq.webex.com/lgehq/j.php?MTID=m5847b94a3946a2c5271a56a6173db10d',
+                password: '123456',
+                qrData: 'https%3A%2F%2Flgehq.webex.com%2Flgehq%2Fj.php%3FMTID%3Dm5847b94a3946a2c5271a56a6173db10d'
+            }
+        };
+
+        // Read URL parameter and apply session data
+        (function applySessionFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const session = params.get('session');
+            const data = SESSION_DATA[session] || SESSION_DATA['sang']; // Default: morning
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Swap dynamic content
+                const timeEl = document.getElementById('sessionTime');
+                const linkEl = document.getElementById('webexLink');
+                const passEl = document.getElementById('sessionPassword');
+                const qrEl = document.getElementById('qrCodeImg');
+
+                if (timeEl) timeEl.textContent = data.time;
+                if (linkEl) {
+                    linkEl.href = data.webexUrl;
+                    linkEl.textContent = data.webexUrl;
+                }
+                if (passEl) passEl.textContent = data.password;
+                if (qrEl) qrEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + data.qrData;
+
+                // Update page title with session label
+                document.title = 'Thư Mời (' + data.label + ') — LG Electronics Việt Nam';
+            });
+        })();
+
+        // =================================================================
         // CONFIGURATION — Change APPS_SCRIPT_URL after deploying Code.gs
         // =================================================================
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_SJTKyrGjO6i8spMjL-LFrjAQXQs0bQqf4B3yetgSsd2l859mTSS6uvT_Ht6iBRlj/exec';
@@ -1491,7 +1538,10 @@
         // COPY INVITATION TEXT
         // =================================================================
         function copyEmailText() {
-            const emailContent = `THƯ MỜI THAM DỰ BUỔI CHIA SẺ TRỰC TUYẾN\nCHÍNH SÁCH QUẢN LÝ JEONG-DO CỦA LG ELECTRONICS VIỆT NAM\n\nKính gửi: Quý Nhà Cung Cấp\n\nPhòng Kiểm toán Công ty LG Electronics Việt Nam xin gửi lời chào trân trọng đến Quý vị. Cảm ơn sự đồng hành quý báu của Quý Nhà Cung Cấp trong thời gian qua. Nhằm tăng cường sự hợp tác bền vững và minh bạch, chúng tôi trân trọng kính mời Quý vị tham dự buổi chia sẻ về "Chính sách Quản lý Jeong-Do" của LG.\n\nTHÔNG TIN SỰ KIỆN:\n- Ngày: Thứ Tư, ngày 19/08/2026\n- Thời gian: 9h30 - 10h30\n- Hình thức: Trực tuyến qua Webex\n- Link: https://lgehq.webex.com/lgehq/j.php?MTID=mcac3bb721ab268f1f080f1e937cda0f5\n- Mật khẩu: 123456\n\n📌 Quý Nhà Cung Cấp vui lòng xác nhận tham dự trước 15:00 Thứ sáu, ngày 14/08/2026.\nLiên hệ: Ms. Hiền (0912371010) hoặc Ms. Hằng (0911100795).\n\nSự tham dự của nhà cung cấp là niềm vinh hạnh của chúng tôi.`;
+            const params = new URLSearchParams(window.location.search);
+            const s = params.get('session');
+            const sd = SESSION_DATA[s] || SESSION_DATA['sang'];
+            const emailContent = `THƯ MỜI THAM DỰ BUỔI CHIA SẺ TRỰC TUYẾN (${sd.label})\nCHÍNH SÁCH QUẢN LÝ JEONG-DO CỦA LG ELECTRONICS VIỆT NAM\n\nKính gửi: Quý Nhà Cung Cấp\n\nPhòng Kiểm toán Công ty LG Electronics Việt Nam xin gửi lời chào trân trọng đến Quý vị. Cảm ơn sự đồng hành quý báu của Quý Nhà Cung Cấp trong thời gian qua. Nhằm tăng cường sự hợp tác bền vững và minh bạch, chúng tôi trân trọng kính mời Quý vị tham dự buổi chia sẻ về "Chính sách Quản lý Jeong-Do" của LG.\n\nTHÔNG TIN SỰ KIỆN:\n- Ngày: Thứ Tư, ngày 19/08/2026\n- Thời gian: ${sd.time}\n- Hình thức: Trực tuyến qua Webex\n- Link: ${sd.webexUrl}\n- Mật khẩu: ${sd.password}\n\n📌 Quý Nhà Cung Cấp vui lòng xác nhận tham dự trước 15:00 Thứ sáu, ngày 14/08/2026.\nLiên hệ: Ms. Hiền (0912371010) hoặc Ms. Hằng (0911100795).\n\nSự tham dự của nhà cung cấp là niềm vinh hạnh của chúng tôi.`;
 
             navigator.clipboard.writeText(emailContent).then(() => {
                 showToastMessage('Đã sao chép nội dung thư mời vào bộ nhớ tạm!');
