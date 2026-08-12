@@ -1479,10 +1479,10 @@
             const name = document.getElementById('attendeeName').value.trim();
             const company = document.getElementById('companyName').value.trim();
 
-            // Determine session → choose template
+            // Determine session → choose invitation template
             const params = new URLSearchParams(window.location.search);
             const session = params.get('session') || 'sang';
-            const templateFile = session === 'chieu' ? 'email_afternoon.html' : 'email_morning.html';
+            const templateFile = session === 'chieu' ? 'invitation_afternoon.html' : 'invitation_morning.html';
             const sessionLabel = session === 'chieu' ? 'Buổi Chiều' : 'Buổi Sáng';
 
             showToastMessage('Đang xuất thiệp mời (' + sessionLabel + ')...');
@@ -1497,7 +1497,7 @@
                 document.head.appendChild(s);
             });
 
-            // Step 2: Fetch email template HTML
+            // Step 2: Fetch invitation template HTML
             const baseUrl = window.location.href.split('?')[0].replace(/\/[^\/]*$/, '/');
             const loadTemplate = fetch(baseUrl + templateFile).then(function(r) {
                 if (!r.ok) throw new Error('Không tải được template: ' + r.status);
@@ -1505,9 +1505,13 @@
             });
 
             Promise.all([loadLib, loadTemplate]).then(function(results) {
-                const templateHTML = results[1];
+                let templateHTML = results[1];
 
-                // Step 3: Create hidden render container
+                // Step 3: Replace placeholders with attendee info
+                templateHTML = templateHTML.replace(/\{\{COMPANY_NAME\}\}/g, company || 'Quý Nhà Cung Cấp');
+                templateHTML = templateHTML.replace(/\{\{ATTENDEE_NAME\}\}/g, name || 'Quý Đại Diện');
+
+                // Step 4: Create hidden render container
                 const container = document.createElement('div');
                 container.id = 'exportContainer';
                 container.style.cssText = 'position:fixed;left:-9999px;top:0;width:860px;z-index:-1;background:#F3E8E5;';
@@ -1526,17 +1530,6 @@
                 const contentDiv = document.createElement('div');
                 contentDiv.innerHTML = doc.body.innerHTML;
                 contentDiv.style.cssText = doc.body.getAttribute('style') || '';
-
-                // Step 4: Inject personalized banner BEFORE the main content
-                if (name || company) {
-                    const banner = document.createElement('div');
-                    banner.style.cssText = 'background:linear-gradient(135deg,#FFF5F7,#FFF0F3);border:1px solid #F5C6D0;border-radius:10px;padding:18px 28px;margin:12px auto 0 auto;max-width:820px;text-align:center;';
-                    let html = '<div style="font-size:11px;color:#A50034;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">THIỆP MỜI DÀNH CHO</div>';
-                    if (name) html += '<div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:4px;">' + name + '</div>';
-                    if (company) html += '<div style="font-size:14px;color:#666;font-weight:500;">' + company + '</div>';
-                    banner.innerHTML = html;
-                    container.appendChild(banner);
-                }
 
                 container.appendChild(contentDiv);
                 document.body.appendChild(container);
